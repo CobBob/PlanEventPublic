@@ -1,0 +1,27 @@
+﻿@model System.Boolean
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@*<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>*@
+
+    <div class="text-center">
+        <h1 class="display-4">Welcome at PlanEvent</h1>
+
+        <p>This website can help you plan events involving multiple people. 
+        Login or register to create an activity, add timeslots to this activity and invite other people by sharing a link. 
+        They do not need to be logged in to submit their availability.</p>
+
+        <p>This webservice is based on services such as "<a href="https://datumprikker.nl/">datumprikker</a>" and "<a href="https://doodle.com">Doodle</a>"</p>
+
+        <p>It is my first attempt at making a project using the ASP.NET MVC Pattern</p>
+
+        <h2><a href=@("/CreateAct/CreateOrganiser")>Create a New Activity</a></h2>
+        @if (Model)
+        {
+            <h2><a href=@("/EditAct/Index")>Enter Existing Activity</a></h2>
+        }
+    </div>

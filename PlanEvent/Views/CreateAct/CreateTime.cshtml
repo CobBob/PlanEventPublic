@@ -1,0 +1,38 @@
+﻿@model PlanEvent.ViewModels.FullActivityViewModel
+
+@{
+    ViewData["Title"] = "CreateTime";
+}
+
+<h4>Propose a time to meet</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateTime">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="StartTime" class="control-label"></label>
+                <input asp-for="StartTime" class="form-control" value="@DateTime.Today"/>
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndTime" class="control-label"></label>
+                <input asp-for="EndTime" class="form-control" value="@DateTime.Today"/>
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="OrganiserName" type="hidden" value="@Model.OrganiserName" />
+            </div>
+            <div class="form-group">
+                <input asp-for="ActivityName" type="hidden" value="@Model.ActivityName" />
+            </div>
+            <div class="form-group">
+                <input asp-for="Description" type="hidden" value="@Model.Description" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+

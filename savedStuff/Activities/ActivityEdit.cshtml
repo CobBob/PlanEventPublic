@@ -1,0 +1,73 @@
+﻿@model PlanEvent.ViewModels.ActivityEditViewModel
+
+@{
+    ViewData["Title"] = "EditActivity";
+}
+
+<h1>Edit Activity</h1>
+
+<h4>Activity</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditActivity">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ActivityId" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <table>
+                    <tr>
+                        <td>table</td>
+                        @{ foreach (var timeProposed in Model.TimeProposeds)
+                            {
+                                <td>
+                                    @timeProposed.StartTime.ToShortDateString() <br />
+                                    @timeProposed.EndTime.ToShortDateString()
+                                </td>
+                            }
+                        }
+                    </tr>
+                    @*<div class="form-group">*@
+                    @{foreach (var invitee in Model.Invitees)
+                        {
+                            <tr>
+                                <td>
+                                    @invitee.Name
+                                    (
+                                    <a asp-controller="Invitees" asp-action="Delete" asp-route-Id="@invitee.InviteeId">x</a>
+                                    )
+                                </td>
+                                @{ foreach (var timeProposed in Model.TimeProposeds)
+                                    {
+                                        <td>
+                                            <input type="checkbox" name="ActivityTimeInviteeTableIds"
+                                                   value="@(invitee.InviteeId.ToString() + "+" + timeProposed.TimeProposedId.ToString())"
+                                                   @((Model.ActivityTimeInvitees.FirstOrDefault( ati => ati.TimeProposedId == timeProposed.TimeProposedId && ati.InviteeId == invitee.InviteeId) != null ? "checked" : "").ToString()) />
+                                        </td>
+
+                                    }
+                                }
+                            </tr>
+                        }
+                    }
+                    @*</div>*@
+                </table>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+                @*<input type="submit" value="AddTime" class="btn btn-primary" />*@
+                <a asp-controller="Invitees" asp-action="ActivityCreate" asp-route-Id="@Model.ActivityId" class="btn btn-primary">AddInvitee</a>
+                @*<a asp-controller="TimeProposeds" asp-action="TimeCreate" asp-route-Id="@Model.ActivityId" class="btn btn-primary">AddTime</a>*@
+            </div>
+        </form>
+    </div>
+</div>

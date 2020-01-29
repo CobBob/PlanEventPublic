@@ -1,0 +1,158 @@
+﻿@using PlanEvent.Data
+@model PlanEvent.ViewModels.ActivityEditViewModel
+
+@{
+    ViewData["Title"] = "MainEdit";
+
+    bool userHasAlreadyEnteredName = this.Context.Request.Cookies.TryGetValue(Model.Guid.ToString(), out string idEntered);
+
+    if (int.TryParse(idEntered, out int idEnteredInt) && Model.Invitees.Count(i => i.InviteeId == idEnteredInt) < 1)
+    {
+        this.Context.Response.Cookies.Delete(Model.Guid.ToString());
+    }
+}
+
+<h4>Activity</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="MainEdit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Guid" />
+            <div class="form-group">
+                @Html.DisplayFor(model => model.Name)
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                @{ if (Model.IsOrganiser)
+                    {
+                        <input asp-for="Description" class="form-control" type="text" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(model => model.Description)
+                    }
+                }
+            </div>
+            <div class="form-group">
+                <table>
+                    <tr>
+                        <td> </td>
+                        @{ foreach (var timeProposed in Model.TimeProposeds)
+                            {
+                                <td>
+                                    <p style="text-align:center">
+                                        @timeProposed.StartTime.ToShortDateString() <br />
+                                        @timeProposed.StartTime.ToShortTimeString() <br />
+                                        to <br />
+                                        @if (timeProposed.StartTime.Date != timeProposed.EndTime.Date)
+                                        {
+                                            @timeProposed.EndTime.ToShortDateString() <br />
+                                        }
+                                        @timeProposed.EndTime.ToShortTimeString() <br />
+
+                                        @if (Model.IsOrganiser)
+                                        {
+                                            <a asp-controller="EditAct" asp-action="DeleteTime" asp-route-id="@timeProposed.TimeProposedId">x</a>
+                                        }
+                                    </p>
+                                </td>
+                            }
+                        }
+                    </tr>
+                    @{foreach (var invitee in Model.Invitees)
+                        {
+                            <tr>
+                                <td>
+                                    <p style="text-align:center">
+                                        @invitee.Name
+                                        @{ if (invitee.InviteeId.ToString() == idEntered || Model.IsOrganiser)
+                                            {
+                                                <a asp-controller="EditAct" asp-action="DeleteInvitee" asp-route-Id="@invitee.InviteeId">x</a>
+                                            }
+                                        }
+                                    </p>
+                                </td>
+                                @{ foreach (var timeProposed in Model.TimeProposeds)
+                                    {
+                                        <td>
+                                            <p style="text-align:center">
+                                                <input type="checkbox" name="ActivityTimeInviteeTableIds"
+                                                       value="@(invitee.InviteeId.ToString() + "+" + timeProposed.TimeProposedId.ToString() + "x1")"
+                                                       @((Model.ActivityTimeInvitees.FirstOrDefault(ati => ati.TimeProposedId == timeProposed.TimeProposedId && ati.InviteeId == invitee.InviteeId).Availability == AVAILABILITY.Y ? "checked" : "").ToString())
+                                                       @(invitee.InviteeId.ToString() == idEntered || Model.IsOrganiser ? "" : "disabled") />
+                                            </p>
+                                        </td>
+                                    }
+                                }
+                            </tr>
+                        }
+                    }
+                </table>
+            </div>
+            <div class="form-group">
+                <dl>
+                    @{ if (userHasAlreadyEnteredName || Model.IsOrganiser)
+                        {
+                            <dt><input type="submit" value="Save Availabilities" class="btn btn-primary" /></dt>
+                        }
+                    }
+                    @{ if (!userHasAlreadyEnteredName || Model.IsOrganiser)
+                        {
+                            <dt><a asp-controller="EditAct" asp-action="AddInvitee" asp-route-guid="@Model.Guid" class="btn btn-primary">Add Invitee</a></dt>
+                        }
+                    }
+                    @{ if (Model.IsOrganiser)
+                        {
+                            <dt><a asp-controller="EditAct" asp-action="AddTime" asp-route-guid="@Model.Guid" class="btn btn-primary">Add Time</a></dt>
+                            <dt><a asp-controller="EditAct" asp-action="DeleteActivity" asp-route-guid="@Model.Guid" class="btn btn-primary">Delete Activity</a></dt>
+
+                            <dt><a asp-controller="EditAct" asp-action="SendEmail" asp-route-guid="@Model.Guid" class="btn btn-primary">Send Email To Invitee</a> *</dt>
+                            <dd><p>*Uses smpt to send an email to one invitee</p></dd>
+                        }
+                    }
+                </dl>
+            </div>
+
+            @{
+                var link = $"{this.Context.Request.Scheme}://{this.Context.Request.Host.Value}{this.Context.Request.Path.Value}{this.Context.Request.QueryString.Value}";
+            }
+
+            <h4>Share the link below to invite more people</h4>
+            <b>@link</b>
+
+            <br /><br />
+
+            <h5><b>How to use</b></h5>
+
+            <h6><b>If you have organiser privilage</b></h6>
+            <p>
+                The functionality of this page depends on how you entered it. If you are the organiser, you have the full view. (Save Availabilities
+                , Add Invitee, Add Time, Delete activity and send email to Invitee). It is important to note that when you send out the link to other people
+                they will not have access to the invitees that you as the organiser added, see below.
+            </p>
+
+            <h6><b>If you followed the link</b></h6>
+            <p>
+                If you got the link then only the add-invitee button is available. After you clicked this button and filled an appropriate name a cookie is
+                saved on your browser. As a result the add-invitee button becomes unavailable and the save-availabilities button available, you can then use
+                the checkboxes to submit your availability by checking them and clicking the afformentioned button.
+            </p>
+            <p>
+                After some testing on different computers the cookie functionality does not always seem to work. To check out the full functionality of this application
+                it might be simpler to create an account and create your own activity. It is my first project with mcv, although i do not like leaving this problem open,
+                another project has taken my interest at the moment, perhaps I will return to it in due time. For teaching me the basics of MVC and displaying some of my
+                skill this web-service should be sufficient.
+            </p>
+        </form>
+    </div>
+</div>
+
+
+
+
+@*<br />
+    <br />
+    <b>Cookie Test : <b>@(this.Context.Request.Cookies.TryGetValue("MyCookiePlanEvent", out string value) ? "dsad :" + value : "nothing")</b>
+    <br /></b>*@

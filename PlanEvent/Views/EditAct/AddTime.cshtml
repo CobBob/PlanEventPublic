@@ -1,0 +1,31 @@
+﻿@model PlanEvent.ViewModels.AddTimeViewModel
+
+@{
+    ViewData["Title"] = "AddTime";
+}
+
+<h4>Propose another time</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddTime">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="StartTime" class="control-label"></label>
+                <input asp-for="StartTime" class="form-control" value="@DateTime.Today"/>
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndTime" class="control-label"></label>
+                <input asp-for="EndTime" class="form-control" value="@DateTime.Today"/>
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="Guid" type="hidden" value="@Model.Guid"/>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
