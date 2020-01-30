@@ -38,11 +38,11 @@ namespace PlanEvent
 
             services.AddTransient<IRepository, Repository>();
 
-            services.AddDbContext<EventDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DeffaultConnection")));
-
             //services.AddDbContext<EventDbContext>(options =>
-            //    options.UseSqlServer(Secrets.connectionstring));
+            //    options.UseSqlServer(Configuration.GetConnectionString("DeffaultConnection")));
+
+            services.AddDbContext<EventDbContext>(options =>
+                options.UseSqlServer(Secrets.connectionstring));
 
             //TODO: figure out what exactly this piece of code does
             services.AddDefaultIdentity<IdentityUser>()
